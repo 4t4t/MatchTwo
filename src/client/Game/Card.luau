@@ -37,9 +37,8 @@ function Card.constructor(self: Card, card: Model)
 end
 
 function Card.Turn(self: Card, duration: number)
-	if self.Card then
+	if (self.Card and not self.State.Turning and not self.State.Locked) then
 		self.State.Turning = true
-		print(self.State)
 		local elapsed = 0
 
 		local start = self.Card:GetPivot()
@@ -56,7 +55,6 @@ function Card.Turn(self: Card, duration: number)
 				RunService:UnbindFromRenderStep("Turn")
 				self.State.Turning = false
 				self.State.Turned = not self.State.Turned
-				print(self.State)
 			end
 		end)
 	end
