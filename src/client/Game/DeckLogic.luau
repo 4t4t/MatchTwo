@@ -1,9 +1,9 @@
 --!strict
-local Card = require(script.Parent.Card)
+local CardLogic = require(script.Parent.CardLogic)
 
 export type Data = {
 	Deal: (self: Data, properties: { any }) -> (),
-    Cards: { Card.Data }
+    Cards: { CardLogic.Data }
 }
 
 type _Data = {}
