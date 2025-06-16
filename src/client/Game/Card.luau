@@ -1,5 +1,4 @@
 --!strict
-local RunService = game:GetService("RunService")
 
 type CardState = {
 	Turned: boolean,
@@ -9,7 +8,9 @@ type CardState = {
 
 export type Data = {
 	new: (self: Data, model: Instance) -> Data,
-	Card: Model,
+	Turn: (self: Data, duration: number) -> (),
+	Model: Model,
+	Property: any,
 	State: CardState,
 }
 type _Data = {}
@@ -19,16 +20,17 @@ Card.__index = Card
 
 type Card = setmetatable<_Data, typeof(Card)> & Data
 
-function Card.new(card: Model): Card
+function Card.new(model: Model, property: any): Card
 	local self = setmetatable({}, Card) :: Card
-	self:constructor(card)
+	self:constructor(model, property)
 	return self
 end
 
-function Card.constructor(self: Card, card: Model)
-	self.Card = card:Clone()
-	self.Card.Parent = workspace
-
+function Card.constructor(self: Card, model: Model, property: any)
+	self.Model = model:Clone()
+	self.Model.Parent = workspace
+	
+	self.Property = property
 	self.State = {
 		Turned = false,
 		Turning = false,
@@ -36,32 +38,40 @@ function Card.constructor(self: Card, card: Model)
 	}
 end
 
+-- TODO remove visual logic out entirely
 function Card.Turn(self: Card, duration: number)
-	if (self.Card and not self.State.Turning and not self.State.Locked) then
-		self.State.Turning = true
-		local elapsed = 0
+	if self.State.Turning == false and self.State.Locked == false then
+		self.State.Turning = true -- beta typechecker infers this insanely weridly
 
-		local start = self.Card:GetPivot()
-		local goal = start * CFrame.Angles(math.rad(180), 0, 0)
-
-		RunService:BindToRenderStep("Turn", 0, function(dt)
-			elapsed += dt
-
-			local alpha = math.clamp(elapsed / duration, 0, 1)
-			local current = start:Lerp(goal, alpha)
-			self.Card:PivotTo(current)
-
-			if alpha >= 1 then
-				RunService:UnbindFromRenderStep("Turn")
-				self.State.Turning = false
-				self.State.Turned = not self.State.Turned
-			end
+		-- task.wait(duration) might be sufficent but unsure if thread blocking
+		task.delay(duration, function()
+			self.State.Turning = false
+			self.State.Turned = not self.State.Turned
 		end)
 	end
+
+	--[[
+	local elapsed = 0
+	local start = self.Model:GetPivot()
+	local goal = start * CFrame.Angles(math.rad(180), 0, 0)
+	RunService:BindToRenderStep("Turn", 0, function(dt)
+		elapsed += dt
+		local alpha = math.clamp(elapsed / duration, 0, 1)
+		local current = start:Lerp(goal, alpha)
+		self.Model:PivotTo(current)
+		if alpha >= 1 then
+			RunService:UnbindFromRenderStep("Turn")
+		end
+	end)
+	]]
 end
 
-function Card.Lock(self: Card)
-	self.State.Locked = true
+function Card.Match(self: Card, property)
+	if self.Property == property then
+		return true
+	end
+
+	return false
 end
 
 return Card

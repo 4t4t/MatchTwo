@@ -2,6 +2,7 @@
 local Card = require(script.Parent.Card)
 
 export type Data = {
+	Deal: (self: Data, properties: { any }) -> (),
     Cards: { Card.Data }
 }
 
@@ -21,11 +22,13 @@ end
 function Deck.constructor(self: Deck)
     self.Cards = {}
 
-
 end
 
-function Deck.DealCards(self: Deck, amount: number)
-    
+function Deck.Deal(self: Deck, properties: { any })
+	for _, property in properties do
+
+		table.insert()
+	end
 end
 
 return Deck
