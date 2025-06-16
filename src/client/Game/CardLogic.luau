@@ -7,9 +7,8 @@ type CardState = {
 }
 
 export type Data = {
-	new: (self: Data, model: Instance) -> Data,
+	new: (self: Data, property: any) -> Data,
 	Turn: (self: Data, duration: number) -> (),
-	Model: Model,
 	Property: any,
 	State: CardState,
 }
@@ -20,17 +19,15 @@ Card.__index = Card
 
 type Card = setmetatable<_Data, typeof(Card)> & Data
 
-function Card.new(model: Model, property: any): Card
+function Card.new(property: any): Card
 	local self = setmetatable({}, Card) :: Card
-	self:constructor(model, property)
+	self:constructor(property)
 	return self
 end
 
-function Card.constructor(self: Card, model: Model, property: any)
-	self.Model = model:Clone()
-	self.Model.Parent = workspace
-	
+function Card.constructor(self: Card, property: any)
 	self.Property = property
+
 	self.State = {
 		Turned = false,
 		Turning = false,
@@ -41,9 +38,8 @@ end
 -- TODO remove visual logic out entirely
 function Card.Turn(self: Card, duration: number)
 	if self.State.Turning == false and self.State.Locked == false then
-		self.State.Turning = true -- beta typechecker infers this insanely weridly
+		self.State.Turning = true 
 
-		-- task.wait(duration) might be sufficent but unsure if thread blocking
 		task.delay(duration, function()
 			self.State.Turning = false
 			self.State.Turned = not self.State.Turned
