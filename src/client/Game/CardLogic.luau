@@ -37,8 +37,8 @@ end
 
 -- TODO remove visual logic out entirely
 function Card.Turn(self: Card, duration: number)
-	if self.State.Turning == false and self.State.Locked == false then
-		self.State.Turning = true 
+	if (self.State.Turning == false and self.State.Locked == false) :: boolean then
+		self.State.Turning = true
 
 		task.delay(duration, function()
 			self.State.Turning = false
