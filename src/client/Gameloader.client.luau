@@ -6,7 +6,13 @@ local DeckLogic = require(script.Parent.Game.DeckLogic)
 
 local Deck = DeckLogic.new()
 
-Deck:Deal({1,2,3,4,5,6,7})
+Deck:Deal({
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+})
 
 Deck:Debug()
 

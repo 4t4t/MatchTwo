@@ -3,14 +3,10 @@ local CardLogic = require(script.Parent.CardLogic)
 
 export type Data = {
 	Deal: (self: Data, properties: { any }) -> (),
-    Cards: { [number]: { [number]: CardLogic.Data } },
-	Front: { X: number, Y: number, },
+	Cards: { CardLogic.Data },
 }
 
 type _Data = {}
-
--- maybe take this in constructor?
-local DECK_WIDTH = 6
 
 local Deck = {}
 Deck.__index = Deck
@@ -24,60 +20,33 @@ function Deck.new(): Deck
 end
 
 function Deck.constructor(self: Deck)
-    self.Cards = {}
-	self.Front = {
-		X = 1,
-		Y = 1,
-	}
+	self.Cards = {}
 end
 
-local function IncrementFront(self: Deck)
-	 if self.Front.X >= DECK_WIDTH then
-		self.Front.X = 1
-		self.Front.Y += 1
-	else
-		self.Front.X += 1
-	end
-end
-
--- Fix repeations using functions idk something smart
 function Deck.Deal(self: Deck, properties: { any })
 	for _, property in properties do
-		local newCard = CardLogic.new(property)
-
-		if self.Cards[self.Front.X] == nil then
-			self.Cards[self.Front.X] = {}
-		end
-		
-		self.Cards[self.Front.X][self.Front.Y] = newCard
-		IncrementFront(self)
+		table.insert(self.Cards, CardLogic.new(property))
+		table.insert(self.Cards, CardLogic.new(property))
 	end
 end
 
--- fix this iteration too
 function Deck.Shuffle(self: Deck)
 	local DECK_SIZE = #self.Cards
 	if DECK_SIZE <= 0 then
 		return
 	end
 
-	for x, col in self.Cards do
-		for y, card in col do
-		local z, w = math.random(1, x), math.random(1, y)
-		
-		self.Cards[x][y], self.Cards[z][w] = self.Cards[z][w], self.Cards[x][y]
-		end
+	for i, _ in self.Cards do
+		local j = math.random(1, i)
+
+		self.Cards[i], self.Cards[j] = self.Cards[j], self.Cards[i]
 	end
 end
 
--- fix this
 function Deck.Debug(self: Deck)
-	for x, col in self.Cards do
-		for y, card in col do
-			print(`Card property at ({x}, {y}) =`, card.Property)
-		end
+	for i, card in self.Cards do
+		print(`Card Property at {i}. Property: {card.Property}. UIDX: {card.UIDX}`)
 	end
 end
-
 
 return Deck

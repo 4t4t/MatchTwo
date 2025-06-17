@@ -9,10 +9,14 @@ type CardState = {
 export type Data = {
 	new: (self: Data, property: any) -> Data,
 	Turn: (self: Data, duration: number) -> (),
+	UIDX: number,
 	Property: any,
 	State: CardState,
 }
+
 type _Data = {}
+
+local UIDX = 1
 
 local Card = {}
 Card.__index = Card
@@ -27,15 +31,17 @@ end
 
 function Card.constructor(self: Card, property: any)
 	self.Property = property
+	self.UIDX = UIDX
 
 	self.State = {
 		Turned = false,
 		Turning = false,
 		Locked = false,
 	}
+
+	UIDX += 1 
 end
 
--- TODO remove visual logic out entirely
 function Card.Turn(self: Card, duration: number)
 	if (self.State.Turning == false and self.State.Locked == false) :: boolean then
 		self.State.Turning = true
@@ -45,21 +51,6 @@ function Card.Turn(self: Card, duration: number)
 			self.State.Turned = not self.State.Turned
 		end)
 	end
-
-	--[[
-	local elapsed = 0
-	local start = self.Model:GetPivot()
-	local goal = start * CFrame.Angles(math.rad(180), 0, 0)
-	RunService:BindToRenderStep("Turn", 0, function(dt)
-		elapsed += dt
-		local alpha = math.clamp(elapsed / duration, 0, 1)
-		local current = start:Lerp(goal, alpha)
-		self.Model:PivotTo(current)
-		if alpha >= 1 then
-			RunService:UnbindFromRenderStep("Turn")
-		end
-	end)
-	]]
 end
 
 function Card.Match(self: Card, property)
