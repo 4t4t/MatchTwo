@@ -1,11 +1,10 @@
 --!strict
 local CardLogic = require("./Game/CardLogic")
-local InputAction = require(script.Parent.Utils.InputAction)
-local DeckLogic = require(script.Parent.Game.DeckLogic)
+local DeckLogic = require("./Game/DeckLogic")
 
 local Deck = DeckLogic.new()
 
-Deck:Deal({"A", "B", "C", "D"}, 2)
+Deck:Deal({"A", "B"}, 2)
 
 local FirstCard = Deck:Find(1) :: CardLogic.Data
 
@@ -17,8 +16,7 @@ for _, card in Deck:GetCards() do
         continue
     end
 
-    if card:Match(FirstCard) then
-        print("Found Match:", card)
-        break
-    end
+   if card:MatchProperty(FirstCard) then
+        print("Found Match", card)
+   end
 end

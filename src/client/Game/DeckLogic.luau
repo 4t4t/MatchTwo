@@ -1,8 +1,8 @@
 --!strict
-local CardLogic = require(script.Parent.CardLogic)
+
+local CardLogic = require("./CardLogic")
 
 export type Data = {
-	new: (self: Data) -> Data,
 	Debug: (self: Data) -> (),
 	GetCards: (self: Data) -> { CardLogic.Data },
 	Deal: (self: Data, properties: { any }, mult: number) -> (),

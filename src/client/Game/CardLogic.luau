@@ -7,9 +7,8 @@ type CardState = {
 }
 
 export type Data = {
-	new: (self: Data, property: any) -> Data,
 	Turn: (self: Data, duration: number) -> (),
-	Match: (self: Data, Card: Data) -> (),
+	MatchProperty: (self: Data, Card: Data) -> (),
 	UIDX: number,
 	Property: any,
 	State: CardState,
@@ -17,7 +16,7 @@ export type Data = {
 
 type _Data = {}
 
-local UIDX = 1
+local iterator = 1
 
 local Card = {}
 Card.__index = Card
@@ -32,7 +31,7 @@ end
 
 function Card.constructor(self: Card, property: any)
 	self.Property = property
-	self.UIDX = UIDX
+	self.UIDX = iterator
 
 	self.State = {
 		Turned = false,
@@ -40,14 +39,14 @@ function Card.constructor(self: Card, property: any)
 		Locked = false,
 	}
 
-	UIDX += 1 
+	iterator += 1 
 end
 
 function Card.Turn(self: Card, duration: number): ()
 	if (self.State.Turning == false and self.State.Locked == false) :: boolean then
 		self.State.Turning = true
 
-		-- Not sure if logic should handle visual changes, but probably yes
+		-- Not sure if logic should account for visual changes, but probably yes
 		task.delay(duration, function()
 			self.State.Turning = false
 			self.State.Turned = not self.State.Turned
@@ -55,7 +54,7 @@ function Card.Turn(self: Card, duration: number): ()
 	end
 end
 
-function Card.Match(self: Card, Card: Card): boolean
+function Card.MatchProperty(self: Card, Card: Card): boolean
 	if self.Property == Card.Property then
 		return true
 	end
