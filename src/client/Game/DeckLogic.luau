@@ -5,6 +5,7 @@ local CardLogic = require("./CardLogic")
 export type Data = {
 	Debug: (self: Data) -> (),
 	GetCards: (self: Data) -> { CardLogic.Data },
+	SetCards: (self: Data, cards: { CardLogic.Data }) -> (),
 	FindUIDX: (self: Data, UIDX: number) -> CardLogic.Data?,
 	Deal: (self: Data, properties: { any }, mult: number) -> (),
 	Shuffle: (self: Data) -> (),
@@ -34,6 +35,10 @@ function Deck.GetCards(self: Deck): { CardLogic.Data }
 	return self.Cards
 end
 
+function Deck.SetCards(self: Deck, cards: { CardLogic.Data })
+	self.Cards = cards
+end
+
 function Deck.FindUIDX(self: Deck, UIDX: number): CardLogic.Data?
 	local cards = self:GetCards()
 
@@ -56,32 +61,45 @@ function Deck.Deal(self: Deck, properties: { any }, mult: number): ()
 end
 
 function Deck.Shuffle(self: Deck): ()
-	if #self.Cards <= 0 then
+	local cards = self:GetCards()
+
+	if #cards <= 0 then
 		return
 	end
 
-	for i, _ in self:GetCards() do
+	for i = 1, #cards do
 		local j = math.random(1, i)
-		self.Cards[i], self.Cards[j] = self.Cards[j], self.Cards[i]
+
+
+		cards[i], cards[j] = cards[j], cards[i]
 	end
+
+	self:SetCards(cards)
 end
 
+-- maybe implement point matching system
 function Deck.Match(self: Deck, ...: CardLogic.Data): boolean
 	local cards = table.pack(...)
 	local first = cards[1]
 
 	for i = 2, #cards do
-		if not cards[i]:MatchProperty(first) then
+		if not cards[i]:MatchProperty(first) or cards[i]:GetLocked() then
 			return false
 		end
+	end
+
+	for i = 1, #cards do
+		cards[i]:Lock()
 	end
 
 	return true
 end
 
 function Deck.Debug(self: Deck): ()
-	for i, card in self:GetCards() do
-		print(`Card: property: {card.Property}, index: {i}, UIDX: {card:GetUIDX()}`)
+	local cards = self:GetCards()
+
+	for i = 1, #cards do
+		print(`Card: property: {cards[i].Property}, index: {i}, UIDX: {cards[i]:GetUIDX()}`)
 	end
 end
 
