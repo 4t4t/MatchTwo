@@ -61,23 +61,19 @@ function Deck.Deal(self: Deck, properties: { any }, mult: number): ()
 end
 
 function Deck.Shuffle(self: Deck): ()
-	local cards = self:GetCards()
-
-	if #cards <= 0 then
+	if #self.Cards <= 0 then
 		return
 	end
 
-	for i = 1, #cards do
+	for i = 1, #self.Cards do
 		local j = math.random(1, i)
 
 
-		cards[i], cards[j] = cards[j], cards[i]
+		self.Cards[i], self.Cards[j] = self.Cards[j], self.Cards[i]
 	end
-
-	self:SetCards(cards)
 end
 
--- maybe implement point matching system
+-- maybe implement point matching system. what the fuck
 function Deck.Match(self: Deck, ...: CardLogic.Data): boolean
 	local cards = table.pack(...)
 	local first = cards[1]
